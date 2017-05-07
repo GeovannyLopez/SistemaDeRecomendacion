@@ -79,7 +79,64 @@ public class KNN {
         return movies;
     }
     
-    
+    public ArrayList<Movie> ActualizarSugerencias(ArrayList<Distancia> Distancias, ArrayList<Integer> Gustados, String NewId) throws SQLException
+    {
+        SQLConnection con = new SQLConnection();
+        ArrayList<Movie> movies = new ArrayList<Movie>();
+        ArrayList<String> Ids = con.GetMovieIds(Gustados);
+        Movie gustada = con.GenerarMovie(NewId);
+        Distancia distaux;
+        for (int j = 0; j < Ids.size(); j++) {
+            //Si no es la película actual con la que se va a comparar
+            if (!Ids.get(j).equals(NewId)) {
+                Movie sugerencia = con.GenerarMovie(Ids.get(j));
+                distaux = new Distancia();
+                distaux.IdOrigen = gustada.Id;
+                distaux.IdDestino = sugerencia.Id;
+                distaux.Distancia = Comparar(sugerencia, gustada);
+                //Criterio de desempate será a partir de la ponderación del destino
+                distaux.Ponderacion = sugerencia.Ponderacion;
+                Distancias.add(distaux);
+            }
+        }
+        Collections.sort(Distancias,(t, t1) -> {
+            if (t.Distancia>t1.Distancia) {
+                return 1;
+            }
+            else if(t.Distancia<t1.Distancia)
+            {
+                return -1;
+            }
+            else
+            {
+                if (t.Ponderacion>=t1.Ponderacion) {
+                    return 1;
+                }
+            }
+            return -1; //To change body of generated lambdas, choose Tools | Templates.
+        });
+        int i = 0;
+        ArrayList<Integer> IdSugerencias = new ArrayList<Integer>();
+        for (Distancia dis: Distancias) {
+            
+            if (i<20) {
+                if (!IdSugerencias.contains(dis.IdDestino)) {
+                    IdSugerencias.add(dis.IdDestino);
+                    movies.add(con.GenerarMovie(dis.IdDestino.toString()));
+                    i++;
+                }//Si es una que ya vio la agregamos pero la mostraríamos en otra tabla
+                else if (Gustados.contains(dis.IdDestino)){
+                    IdSugerencias.add(dis.IdDestino);
+                    movies.add(con.GenerarMovie(dis.IdDestino.toString()));
+                }    
+            }
+            else
+            {
+                break;
+            }
+        }
+        return movies;
+    }
     
     //Compara dos películas, una como sugerencia y otra que ya sabemos que le gustó
     public double Comparar(Movie sugerencia, Movie Gustado)
@@ -94,7 +151,7 @@ public class KNN {
             Distancia = Distancia + AuxDistancia;
         }
         //Año
-        AuxDistancia = Math.abs(sugerencia.Anio - Gustado.Anio)/5;
+        AuxDistancia = Math.abs(sugerencia.Anio - Gustado.Anio)/10;
         Distancia = Distancia + Math.pow(AuxDistancia,2);
         //Pais
         if (!sugerencia.Pais.equals(Gustado.Pais)) {

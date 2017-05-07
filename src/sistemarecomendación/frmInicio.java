@@ -24,11 +24,13 @@ public class frmInicio extends javax.swing.JFrame {
     ArrayList<Integer> Likes;
     SQLConnection connection = new SQLConnection();
     KNN knn = new KNN();
+    ArrayList<Distancia> Distancias;
     public frmInicio() {
         //Inicializar componentes del formulario
         initComponents();
         this.setLocationRelativeTo(null);
         Likes = new ArrayList<Integer>();
+        Distancias = new ArrayList<Distancia>();
         //Obtener el modelo de la tabla
         model = (DefaultTableModel)tBuscar.getModel();
         //Ocultar la columna de Id
@@ -383,10 +385,10 @@ public class frmInicio extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_tVolverAMouseClicked
     
-    public void ActualizarSugerencias() throws SQLException
+    public void ActualizarSugerencias(String NewId) throws SQLException
     {
-        ArrayList<Movie> movies = knn.GenerarSugerencias(Likes);
-        
+        //ArrayList<Movie> movies = knn.GenerarSugerencias(Likes);
+        ArrayList<Movie> movies = knn.ActualizarSugerencias(Distancias, Likes, NewId);
         DefaultTableModel modelaux = (DefaultTableModel)tSugerencias.getModel();
         //Remove all rows in table
         int rowCount = modelaux.getRowCount();

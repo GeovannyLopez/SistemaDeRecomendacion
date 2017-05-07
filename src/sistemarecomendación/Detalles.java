@@ -293,7 +293,7 @@ public class Detalles extends javax.swing.JFrame {
         Likes.add(Integer.parseInt(Id));
         Object [] opciones ={"Aceptar"};
         try {
-            Inicio.ActualizarSugerencias();
+            Inicio.ActualizarSugerencias(Id);
         } catch (SQLException ex) {
             Logger.getLogger(Detalles.class.getName()).log(Level.SEVERE, null, ex);
         }
