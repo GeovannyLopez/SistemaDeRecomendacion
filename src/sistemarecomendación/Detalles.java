@@ -292,11 +292,9 @@ public class Detalles extends javax.swing.JFrame {
     private void btnSolicitarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolicitarActionPerformed
         Likes.add(Integer.parseInt(Id));
         Object [] opciones ={"Aceptar"};
-        try {
-            Inicio.ActualizarSugerencias(Id);
-        } catch (SQLException ex) {
-            Logger.getLogger(Detalles.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Thread hilo = new Proceso("Actualizar", Id, Inicio);
+        hilo.start();
+        //Inicio.ActualizarSugerencias(Id);
         btnSolicitar.setEnabled(false);
         JOptionPane.showOptionDialog(rootPane,"Se Solicitado la película","Mensaje de Confirmacion",JOptionPane.YES_NO_OPTION,
         JOptionPane.INFORMATION_MESSAGE,null,opciones,"Aceptar");
