@@ -79,65 +79,71 @@ public class KNN {
         return movies;
     }
     
-    public ArrayList<Movie> ActualizarSugerencias(ArrayList<Distancia> Distancias, ArrayList<Integer> Gustados, String NewId) throws SQLException
+    public ArrayList<Movie> ActualizarSugerencias( ArrayList<Integer> Gustados, String NewId) throws SQLException
     {
         SQLConnection con = new SQLConnection();
         ArrayList<Movie> movies = new ArrayList<Movie>();
-        ArrayList<String> Ids = con.GetMovieIds(Gustados);
-        Movie gustada = con.GenerarMovie(NewId);
-        Distancia distaux;
-        for (int j = 0; j < Ids.size(); j++) {
-            //Si no es la película actual con la que se va a comparar
-            if (!Ids.get(j).equals(NewId)) {
-                Movie sugerencia = con.GenerarMovie(Ids.get(j));
-                distaux = new Distancia();
-                distaux.IdOrigen = gustada.Id;
-                distaux.IdDestino = sugerencia.Id;
-                distaux.Distancia = Comparar(sugerencia, gustada);
-                //Criterio de desempate será a partir de la ponderación del destino
-                distaux.Ponderacion = sugerencia.Ponderacion;
-                Distancias.add(distaux);
-            }
-        }
-        Collections.sort(Distancias,(t, t1) -> {
-            if (t.Distancia>t1.Distancia) {
-                return 1;
-            }
-            else if(t.Distancia<t1.Distancia)
-            {
-                return -1;
-            }
-            else
-            {
-                if (t.Ponderacion>=t1.Ponderacion) {
-                    return 1;
+        ArrayList<String> Ids;
+        ArrayList<String> Agregadas = new ArrayList<String>();
+        //Si aun no hay datos en la base se calculan y se ingresan
+        if(!con.VerificarDistancias(NewId))
+        {
+            Movie gustada = con.GenerarMovie(NewId);
+            Ids = con.GetMovieIds(Gustados);
+            for (int i = 0; i < Ids.size(); i++) {
+                if (!Ids.get(i).equals(NewId)) {
+                    Distancia distaux;
+                    Movie sugerencia = con.GenerarMovie(Ids.get(i));
+                    distaux = new Distancia();
+                    distaux.IdOrigen = gustada.Id;
+                    distaux.IdDestino = sugerencia.Id;
+                    distaux.Distancia = Comparar(sugerencia, gustada);
+                    //Criterio de desempate será a partir de la ponderación del destino
+                    distaux.Ponderacion = sugerencia.Ponderacion;
+                    con.IngresarDistancia(distaux);
                 }
             }
-            return -1; //To change body of generated lambdas, choose Tools | Templates.
-        });
-        int i = 0;
-        ArrayList<Integer> IdSugerencias = new ArrayList<Integer>();
-        for (Distancia dis: Distancias) {
-            
-            if (i<20) {
-                if (!IdSugerencias.contains(dis.IdDestino)) {
-                    IdSugerencias.add(dis.IdDestino);
-                    movies.add(con.GenerarMovie(dis.IdDestino.toString()));
-                    i++;
-                }//Si es una que ya vio la agregamos pero la mostraríamos en otra tabla
-                else if (Gustados.contains(dis.IdDestino)){
-                    IdSugerencias.add(dis.IdDestino);
-                    movies.add(con.GenerarMovie(dis.IdDestino.toString()));
-                }    
-            }
-            else
+        }
+        Ids = con.ObtenerSugerencias(Gustados);
+        for (int i = 0; i < Ids.size(); i++) {
+            if(!Agregadas.contains(Ids.get(i)))
             {
-                break;
+                Agregadas.add(Ids.get(i));
+                movies.add(con.GenerarMovie(Ids.get(i)));
             }
         }
+        
         return movies;
     }
     
+    public void GenerarDistancias()
+    {
+        try
+        {
+            SQLConnection con = new SQLConnection();
+            ArrayList<String> Ids = con.GetMovieIds("1723");
+            ArrayList<String> Ids2 = con.GetMovieIds("0");
+            for (int i = 0; i < Ids.size(); i++) {
+                Movie Origen = con.GenerarMovie(Ids.get(i));
+                for (int j = 0; j < Ids2.size(); j++) {
+                    if (!Ids2.get(j).equals(Ids.get(i))) {
+                        Movie Destino = con.GenerarMovie(Ids2.get(j));
+                        Distancia distaux = new Distancia();
+                        distaux.IdOrigen = Origen.Id;
+                        distaux.IdDestino = Destino.Id;
+                        distaux.Distancia = Comparar(Destino, Origen);
+                        //Criterio de desempate será a partir de la ponderación del destino
+                        distaux.Ponderacion = Destino.Ponderacion;
+                        con.IngresarDistancia(distaux);
+                    }
+                }
+            }
+        }catch(Exception ex)
+        {
+            
+        }
+        
+    }
     //Compara dos películas, una como sugerencia y otra que ya sabemos que le gustó
     public double Comparar(Movie sugerencia, Movie Gustado)
     {

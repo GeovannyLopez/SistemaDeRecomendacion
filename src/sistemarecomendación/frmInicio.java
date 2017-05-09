@@ -24,13 +24,12 @@ public class frmInicio extends javax.swing.JFrame {
     ArrayList<Integer> Likes;
     SQLConnection connection = new SQLConnection();
     KNN knn = new KNN();
-    ArrayList<Distancia> Distancias;
     public frmInicio() {
         //Inicializar componentes del formulario
         initComponents();
         this.setLocationRelativeTo(null);
+        //knn.GenerarDistancias();
         Likes = new ArrayList<Integer>();
-        Distancias = new ArrayList<Distancia>();
         //Obtener el modelo de la tabla
         model = (DefaultTableModel)tBuscar.getModel();
         //Ocultar la columna de Id
@@ -91,6 +90,11 @@ public class frmInicio extends javax.swing.JFrame {
         tbBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tbBuscarActionPerformed(evt);
+            }
+        });
+        tbBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tbBuscarKeyReleased(evt);
             }
         });
 
@@ -315,6 +319,11 @@ public class frmInicio extends javax.swing.JFrame {
     }//GEN-LAST:event_tBuscarMouseClicked
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        Buscar();
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void Buscar()
+    {
         String SearchString = tbBuscar.getText().replace("'", "''");
         if (SearchString.length() > 0) {
             String sqlQuery =   "SELECT " +
@@ -358,10 +367,8 @@ public class frmInicio extends javax.swing.JFrame {
                     });
                 }
 
-            }
-
-    }//GEN-LAST:event_btnBuscarActionPerformed
-
+        }
+    }
     private void tbBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbBuscarActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_tbBuscarActionPerformed
@@ -384,11 +391,19 @@ public class frmInicio extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_tVolverAMouseClicked
+
+    private void tbBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbBuscarKeyReleased
+        int code = evt.getKeyCode(); 
+        //Si es enter que busque
+        if (code == 10) {
+            Buscar();
+        }
+    }//GEN-LAST:event_tbBuscarKeyReleased
     
     public void ActualizarSugerencias(String NewId) throws SQLException
     {
         //ArrayList<Movie> movies = knn.GenerarSugerencias(Likes);
-        ArrayList<Movie> movies = knn.ActualizarSugerencias(Distancias, Likes, NewId);
+        ArrayList<Movie> movies = knn.ActualizarSugerencias(Likes, NewId);
         DefaultTableModel modelaux = (DefaultTableModel)tSugerencias.getModel();
         //Remove all rows in table
         int rowCount = modelaux.getRowCount();
@@ -396,18 +411,26 @@ public class frmInicio extends javax.swing.JFrame {
         for (int i = rowCount - 1; i >= 0; i--) {
                 modelaux.removeRow(i);
             }
-        
+        int contador = 0;
         for (int i = 0; i < movies.size(); i++) {
             if (!Likes.contains(movies.get(i).Id)) {
-                modelaux.insertRow(modelaux.getRowCount(),
-                new Object[]{String.valueOf(movies.get(i).Id),
-                    movies.get(i).Nombre,
-                    movies.get(i).Director,
-                    String.valueOf(movies.get(i).Anio),
-                    movies.get(i).Idioma,
-                    movies.get(i).Pais,
-                    new JButton("Detalles")
-                });
+                if(contador<20)
+                {
+                    modelaux.insertRow(modelaux.getRowCount(),
+                    new Object[]{String.valueOf(movies.get(i).Id),
+                        movies.get(i).Nombre,
+                        movies.get(i).Director,
+                        String.valueOf(movies.get(i).Anio),
+                        movies.get(i).Idioma,
+                        movies.get(i).Pais,
+                        new JButton("Detalles")
+                    });
+                    contador++;
+                }
+                else
+                {
+                    break;
+                }
             }
             
         }
@@ -515,26 +538,19 @@ public class frmInicio extends javax.swing.JFrame {
 //https://www.mssqltips.com/sqlservertip/4709/connecting-a-java-program-to-sql-server/
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
-    private javax.swing.JButton btnBuscar1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblBuscar;
-    private javax.swing.JLabel lblBuscar1;
     private javax.swing.JLabel lblSolicitadas;
     private javax.swing.JLabel lblTitulo;
-    private javax.swing.JLabel lblTitulo1;
     private javax.swing.JLabel lblTitulo2;
     private javax.swing.JTable tBuscar;
-    private javax.swing.JTable tBuscar1;
     private javax.swing.JTable tSugerencias;
     private javax.swing.JTable tVolverA;
     private javax.swing.JTextField tbBuscar;
-    private javax.swing.JTextField tbBuscar1;
     // End of variables declaration//GEN-END:variables
 }

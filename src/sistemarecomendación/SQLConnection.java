@@ -172,4 +172,92 @@ public class SQLConnection {
         }
         return Ids;
     }
+    
+     public ArrayList<String> GetMovieIds(String idorigen) throws SQLException
+    {
+        ArrayList<String> Ids = new ArrayList<String>();
+        String aux = "";
+        Statement sqlStatement = databaseConnection.createStatement();
+        String queryString = "SELECT IdMovie [IdMovie] FROM MOVIE WHERE IdMovie >= "+idorigen+ " ORDER BY IDMOVIE ASC"// +
+                            //" WHERE IdMovie != " + Id + ";"
+                ;
+        
+        ResultSet rs = null;
+        
+        //execute the query
+        rs=sqlStatement.executeQuery(queryString);
+        while (rs.next())
+        {
+            aux = rs.getString("IdMovie");
+            //Si vamos a permitir hacer comparaciones con otros que ya esten en la lista pues se omite el if
+            //if (!Gustados.contains(Integer.parseInt(aux))) {
+                Ids.add(aux);
+            //}
+        }
+        return Ids;
+    }
+     
+     public void IngresarDistancia(Distancia distancia) 
+     {
+         try
+         {
+             String queryString = "INSERT INTO DISTANCIA " +
+                              "(IdOrigen, IdDestino, Distancia, Ponderacion)" + 
+                              "VALUES (" +
+                              distancia.IdOrigen.toString() + " , " +
+                              distancia.IdDestino.toString() + " , " +
+                              String.valueOf(distancia.Distancia) + " , " + 
+                              String.valueOf(distancia.Ponderacion) + " );";
+         Statement sqlStatement = databaseConnection.createStatement();
+         sqlStatement.execute(queryString);
+         }catch (Exception ex)
+         {
+             
+         }
+         
+     }
+     
+     public Boolean VerificarDistancias(String id) throws SQLException
+     {
+        String aux = "";
+        Statement sqlStatement = databaseConnection.createStatement();
+        String queryString = "SELECT Count(*) [Conteo] FROM DISTANCIA WHERE IdOrigen = " + id+ " ;";
+        
+        ResultSet rs = null;
+        
+        //execute the query
+        rs=sqlStatement.executeQuery(queryString);
+        rs.next();
+        aux = rs.getString("Conteo");
+        
+        return Integer.valueOf(aux)>0;
+     }
+     
+     public ArrayList<String> ObtenerSugerencias(List<Integer> Gustados) throws SQLException
+     {
+         ArrayList<String> Ids = new ArrayList<String>();
+         String aux = "";
+         Statement sqlStatement = databaseConnection.createStatement();
+         String query = "SELECT DISTINCT TOP 200  IdDestino [IdMovie], Distancia FROM DISTANCIA WHERE IdOrigen IN (";
+         for (int i = 0; i < Gustados.size(); i++) {
+             if (i==0) {
+                 query = query + Gustados.get(i).toString();
+             }
+             else
+             {
+                 query = query + " , " + Gustados.get(i).toString();
+             }
+         }
+         query = query + ") ORDER BY 2 ASC;";
+         ResultSet rs = null;
+        
+        //execute the query
+        rs=sqlStatement.executeQuery(query);
+        while (rs.next())
+        {
+            aux = rs.getString("IdMovie");
+            Ids.add(aux);
+        }
+        return Ids;
+     }
 }
