@@ -330,7 +330,7 @@ public class frmInicio extends javax.swing.JFrame {
             "IDMOVIE [Id], " +            
             "Nombre [Nombre], " +
             "Director [Director], " +
-            "Anio [Anio], " +
+            "CASE WHEN Anio = 0 THEN '-' ELSE CONVERT(NVARCHAR(5), Anio) END [Anio], " +
             "IDIOMA [Idioma], " +
             "PAIS [Pais] " +
             "FROM MOVIE " +
@@ -416,11 +416,20 @@ public class frmInicio extends javax.swing.JFrame {
             if (!Likes.contains(movies.get(i).Id)) {
                 if(contador<20)
                 {
+                    String anio;
+                    if(movies.get(i).Anio!=0)
+                    {
+                        anio = String.valueOf(movies.get(i).Anio);
+                    }
+                    else
+                    {
+                        anio = "-";
+                    }
                     modelaux.insertRow(modelaux.getRowCount(),
                     new Object[]{String.valueOf(movies.get(i).Id),
                         movies.get(i).Nombre,
                         movies.get(i).Director,
-                        String.valueOf(movies.get(i).Anio),
+                        anio,
                         movies.get(i).Idioma,
                         movies.get(i).Pais,
                         new JButton("Detalles")
@@ -462,7 +471,7 @@ public class frmInicio extends javax.swing.JFrame {
             "IDMOVIE [Id], " +
             "Nombre [Nombre], " +
             "Director [Director], " +
-            "Anio [Anio], " +
+            "CASE WHEN Anio = 0 THEN '-' ELSE CONVERT(NVARCHAR(5), Anio) END [Anio], " +
             "IDIOMA [Idioma], " +
             "PAIS [Pais], " +
             "(Punteo/2+5*(1-POWER((2.71828),-NumRating/1000000)))  [Ponderacion]" +

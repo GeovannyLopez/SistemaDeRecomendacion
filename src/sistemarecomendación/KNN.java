@@ -121,7 +121,7 @@ public class KNN {
         try
         {
             SQLConnection con = new SQLConnection();
-            ArrayList<String> Ids = con.GetMovieIds("1723");
+            ArrayList<String> Ids = con.GetMovieIds("0");
             ArrayList<String> Ids2 = con.GetMovieIds("0");
             for (int i = 0; i < Ids.size(); i++) {
                 Movie Origen = con.GenerarMovie(Ids.get(i));
@@ -152,13 +152,27 @@ public class KNN {
         //Director
         String aux1 = sugerencia.Director.toLowerCase();
         String aux2 = Gustado.Director.toLowerCase();
-        if (!(aux1.contains(aux2) || aux2.contains(aux1))) {
+        if(aux2!="n/a")
+        {
+            if (!(aux1.contains(aux2) || aux2.contains(aux1))) {
             AuxDistancia = Math.pow(1, 2);
             Distancia = Distancia + AuxDistancia;
+            }
         }
+        
         //Año
-        AuxDistancia = Math.abs(sugerencia.Anio - Gustado.Anio)/10;
-        Distancia = Distancia + Math.pow(AuxDistancia,2);
+        if(sugerencia.Anio != 0 && Gustado.Anio!=0)
+        {
+            AuxDistancia = Math.abs(sugerencia.Anio - Gustado.Anio)/10;
+            Distancia = Distancia + Math.pow(AuxDistancia,2);
+        }
+        else
+        {
+            //Si alguna no tiene dato de año se sumará una distancia de 2
+            AuxDistancia = 2;
+            Distancia = Distancia + Math.pow(AuxDistancia,2);
+        }
+        
         //Pais
         if (!sugerencia.Pais.equals(Gustado.Pais)) {
             AuxDistancia = Math.pow(1, 2);
