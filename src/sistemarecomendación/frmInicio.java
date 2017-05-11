@@ -5,8 +5,10 @@
  */
 package sistemarecomendación;
 
+import java.awt.Image;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -354,7 +356,10 @@ public class frmInicio extends javax.swing.JFrame {
             for (int i = rowCount - 1; i >= 0; i--) {
                 model.removeRow(i);
             }
-
+            
+            ImageIcon icon = new ImageIcon(new ImageIcon("lupa.png").getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT));
+            JButton buton = new JButton("Ver");
+            buton.setIcon(icon);
             for (int i = 0; i < Busqueda.size(); i++) {
                 model.insertRow(model.getRowCount(),
                     new Object[]{Busqueda.get(i).get(0),
@@ -363,7 +368,7 @@ public class frmInicio extends javax.swing.JFrame {
                         Busqueda.get(i).get(3),
                         Busqueda.get(i).get(4),
                         Busqueda.get(i).get(5),
-                        new JButton("Detalles")
+                        buton
                     });
                 }
 
@@ -412,6 +417,9 @@ public class frmInicio extends javax.swing.JFrame {
                 modelaux.removeRow(i);
             }
         int contador = 0;
+        ImageIcon icon = new ImageIcon(new ImageIcon("lupa.png").getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT));
+        JButton buton = new JButton("Ver");
+        buton.setIcon(icon);
         for (int i = 0; i < movies.size(); i++) {
             if (!Likes.contains(movies.get(i).Id)) {
                 if(contador<20)
@@ -432,7 +440,7 @@ public class frmInicio extends javax.swing.JFrame {
                         anio,
                         movies.get(i).Idioma,
                         movies.get(i).Pais,
-                        new JButton("Detalles")
+                        buton
                     });
                     contador++;
                 }
@@ -449,6 +457,7 @@ public class frmInicio extends javax.swing.JFrame {
         for (int i = rowCount - 1; i >= 0; i--) {
                 modelaux.removeRow(i);
         }
+        
         //Add to the other table
         for (int i = 0; i < movies.size(); i++) {
             if (Likes.contains(movies.get(i).Id)) {
@@ -459,7 +468,7 @@ public class frmInicio extends javax.swing.JFrame {
                     String.valueOf(movies.get(i).Anio),
                     movies.get(i).Idioma,
                     movies.get(i).Pais,
-                    new JButton("Detalles")
+                    buton
                 });
             }
         }
@@ -474,7 +483,7 @@ public class frmInicio extends javax.swing.JFrame {
             "CASE WHEN Anio = 0 THEN '-' ELSE CONVERT(NVARCHAR(5), Anio) END [Anio], " +
             "IDIOMA [Idioma], " +
             "PAIS [Pais], " +
-            "(Punteo/2+5*(1-POWER((2.71828),-NumRating/1000000)))  [Ponderacion]" +
+            "(Punteo/2+5*(1-POWER((2.71828),-NumRating/500000)))  [Ponderacion]" +
             "FROM MOVIE ORDER BY Ponderacion DESC;";
 
         ArrayList<String> Columns = new ArrayList<String>();
@@ -497,7 +506,9 @@ public class frmInicio extends javax.swing.JFrame {
         for (int i = rowCount - 1; i >= 0; i--) {
             //(, i);
         }
-        
+        ImageIcon icon = new ImageIcon(new ImageIcon("lupa.png").getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT));
+        JButton buton = new JButton("Ver");
+        buton.setIcon(icon);
         for (int i = 0; i < Busqueda.size(); i++) {
             modelaux.insertRow(modelaux.getRowCount(),
                 new Object[]{Busqueda.get(i).get(0),
@@ -506,7 +517,7 @@ public class frmInicio extends javax.swing.JFrame {
                     Busqueda.get(i).get(3),
                     Busqueda.get(i).get(4),
                     Busqueda.get(i).get(5),
-                    new JButton("Detalles")
+                    buton
                 });
         }
     }
